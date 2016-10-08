@@ -80,18 +80,15 @@ public static class InitialReducer
 public void reduce(Text key, Iterable<Text> values, 
                    Context context
                    ) throws IOException, InterruptedException {   
-	   double rank=0.15;
-	   double factor = 0.85;
+	  double rank=0.15;
+	  double factor = 0.85;
 		String[] str;
 		Text outLinks = new Text();// outlinks
 		
 		for (Text t : values) {
-			
 			str = t.toString().split(";");
-
 			if (str.length == 3) {
-				rank += Double.parseDouble(str[1]) / Integer.parseInt(str[2])
-						* factor;
+				rank += Double.parseDouble(str[1]) / Integer.parseInt(str[2])* factor;
 			} else {
 				// record outlinks
 				outLinks.set(t.toString());
@@ -122,7 +119,7 @@ public void reduce(Text key, Iterable<Text> values,
 	   num.set(-Double.parseDouble(parentpr));
 	   
 	   //System.out.println(num+ " "+parentnode);
-       context.write(num, new Text(parentnode));
+     context.write(num, new Text(parentnode));
 	
    }
 } 
@@ -138,9 +135,7 @@ public void reduce(Text key, Iterable<Text> values,
 	//System.out.println("the following is reducer");
 	String parentnode = "";
 	 for (Text val : values) {
-	  
 		 parentnode = parentnode+val.toString();
-
 	}
 	 result.set(parentnode);
 	 pr.set(0-key.get());
@@ -156,7 +151,7 @@ public void reduce(Text key, Iterable<Text> values,
       System.err.println("Usage: pagerank <in> <out>");
       System.exit(2);
     }
-   ////////////
+   
     Job job1 = new Job(conf, "part1");
     job1.setJarByClass(pagerank.class);
     job1.setMapperClass(InitialMapper.class);
@@ -170,32 +165,28 @@ public void reduce(Text key, Iterable<Text> values,
     FileOutputFormat.setOutputPath(job1, new Path("txt1"));
     
     job1.waitForCompletion(true);
-    ////////////////////////////////property printing
-   
     
-   ////////// 
    int i=0;
- 
    while (i<9)
     {
     	i++ ;
     	String In = Integer.toString(i);
     	String Out = Integer.toString(i+1);
-    Job job2 = new Job(conf, "part2");
-    job2.setJarByClass(pagerank.class);
-    job2.setMapperClass(InitialMapper.class);
-    
-    job2.setReducerClass(InitialReducer.class);
-   
-    job2.setOutputKeyClass(Text.class);
-    job2.setOutputValueClass(Text.class);
-    
-    FileInputFormat.addInputPath(job2, new Path("txt"+In));
-    FileOutputFormat.setOutputPath(job2, new Path("txt"+Out));
-   
-    job2.waitForCompletion(true);
+      Job job2 = new Job(conf, "part2");
+      job2.setJarByClass(pagerank.class);
+      job2.setMapperClass(InitialMapper.class);
+      
+      job2.setReducerClass(InitialReducer.class);
+     
+      job2.setOutputKeyClass(Text.class);
+      job2.setOutputValueClass(Text.class);
+      
+      FileInputFormat.addInputPath(job2, new Path("txt"+In));
+      FileOutputFormat.setOutputPath(job2, new Path("txt"+Out));
+     
+      job2.waitForCompletion(true);
     }
-   ///////
+ 
    Job job3 = new Job(conf, "part3");
    job3.setJarByClass(pagerank.class);
    job3.setMapperClass(SequenceMapper.class);
